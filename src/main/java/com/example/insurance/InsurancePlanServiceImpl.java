@@ -1,53 +1,69 @@
 package com.example.insurance;
 
-import java.util.List;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
+import static com.example.insurance.PlanStatus.*;
+
+@Service
 public class InsurancePlanServiceImpl implements InsurancePlanService {
     private final MemberRepository memberRepository;
     private final InsurancePlanRepository insurancePlanRepository;
-    private final ProfileRepository profileRepository;
     private final CoverageTypeRepository coverageTypeRepository;
 
-    public InsurancePlanServiceImpl(MemberRepository memberRepository, InsurancePlanRepository insurancePlanRepository, ProfileRepository profileRepository, CoverageTypeRepository coverageTypeRepository) {
+    public InsurancePlanServiceImpl(MemberRepository memberRepository, InsurancePlanRepository insurancePlanRepository, CoverageTypeRepository coverageTypeRepository) {
         this.memberRepository = memberRepository;
         this.insurancePlanRepository = insurancePlanRepository;
-        this.profileRepository = profileRepository;
         this.coverageTypeRepository = coverageTypeRepository;
     }
 
     @Override
-    public InsurancePlan newInsurancePlan(InsurancePlanRequest newInsurancePlan) {
-
-        return null;
+    public InsurancePlan newInsurancePlan(InsurancePlanRequest request) {
+        Long memberId = request.memberId();
+        Long covergeTypeId = request.coverageTypeId();
+        Member member = memberRepository.findById(request.memberId()).orElse(null);
+        CoverageType coverageType = coverageTypeRepository.findById(request.coverageTypeId()).orElse(null);
+        InsurancePlan insurancePlan = new InsurancePlan();
+        insurancePlan.setMember(member);
+        insurancePlan.setCoverageType(coverageType);
+        insurancePlan.setPlanStatus(ACTIVE);
+        insurancePlan.setEndDate(request.endDate());
+        insurancePlan.setStartDate(request.startDate());
+        insurancePlan.setPremiumAmount(request.premiumAmount());
+        return insurancePlanRepository.save(insurancePlan);
     }
 
     @Override
     public List<InsurancePlan> getAllInsurancePlan() {
-        return List.of();
+        return insurancePlanRepository.findAll();
     }
 
     @Override
     public InsurancePlan getInsurancePlanById(Long id) {
-        return null;
+        return insurancePlanRepository.findById(id).orElse(null);
     }
 
     @Override
     public List<InsurancePlan> getAllActiveInsurancePlan() {
-        return List.of();
+        return insurancePlanRepository.findByPlanStatus(PlanStatus.ACTIVE);
     }
 
     @Override
     public List<InsurancePlan> getInsurancePlanByCoverageType(Long coverageTypeId) {
-        return List.of();
+        return insurancePlanRepository.findByCoverageTypeId(coverageTypeId);
     }
 
     @Override
     public InsurancePlan cancelInsurancePlan(Long id) {
-        return null;
+        InsurancePlan plan = insurancePlanRepository.findById(id).orElse(null);
+        plan.setPlanStatus(PlanStatus.CANCELLED);
+        return insurancePlanRepository.save(plan);
     }
 
     @Override
     public void deleteInsurancePlan(Long id) {
-
+        insurancePlanRepository.deleteById(id);
     }
 }

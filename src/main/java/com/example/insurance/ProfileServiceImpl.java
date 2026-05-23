@@ -44,10 +44,3 @@ public class ProfileServiceImpl implements ProfileService {
         profileRepository.deleteById(id);
     }
 }
-
-/*
- Profile addProfile(ProfileRequest newProfile);
-    Profile getProfileByMemberId(Long id);
-    Profile updateProfile(Long id, ProfileRequest updateProfile);
-    void deleteProfile(Long id);
- */
